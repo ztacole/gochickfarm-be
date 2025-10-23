@@ -7,3 +7,12 @@ export interface AnimalResponse {
     weight: number;
     birthdate: string;
 }
+
+export interface AnimalRequest {
+    tag: string;
+    species_id: number;
+    birthdate: string;
+    sex: "Jantan" | "Betina";
+    weight: number;
+    status: "Hidup" | "Mati";
+}

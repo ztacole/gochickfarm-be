@@ -3,11 +3,11 @@ import {
     animals as animalTable,
     species as speciesTable
 } from '../../../drizzle/schema';
-import { AnimalResponse } from './animal.type';
+import { AnimalRequest, AnimalResponse } from './animal.type';
 import { and, asc, eq, like } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAge } from '../../helper/helper';
-import { NotFoundError } from '../../common/error';
+import { AppError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
     static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = ''): Promise<{ data: AnimalResponse[], meta: Meta }> {
@@ -18,8 +18,7 @@ export class AnimalService {
             birthdate: animalTable.birthdate,
             sex: animalTable.sex,
             weight: animalTable.weight
-        })
-            .from(animalTable)
+        }).from(animalTable)
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
             .where(
                 and(
@@ -65,8 +64,7 @@ export class AnimalService {
             birthdate: animalTable.birthdate,
             sex: animalTable.sex,
             weight: animalTable.weight
-        })
-            .from(animalTable)
+        }).from(animalTable)
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
             .where(eq(animalTable.id, id));
 
@@ -81,5 +79,52 @@ export class AnimalService {
             weight: animal.weight,
             birthdate: animal.birthdate.toISOString().split('T')[0]
         };
+    }
+
+    static async createAnimal(data: AnimalRequest): Promise<any> {
+        try {
+            const [result] = await db.insert(animalTable).values({
+                tag: data.tag,
+                species_id: data.species_id,
+                birthdate: new Date(data.birthdate),
+                sex: data.sex,
+                weight: data.weight,
+                status: 'Hidup'
+            }).$returningId();
+            return {
+                id: Number(result)
+            };
+        } catch (error) {
+            throw new AppError('Failed to create animal.', 500);
+        }
+    }
+
+    static async updateAnimal(id: number, data: Partial<AnimalRequest>): Promise<void> {
+        const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
+        if (!animal) throw new NotFoundError('Animal not found!');
+
+        try {
+            await db.update(animalTable).set({
+                tag: data.tag ?? animal.tag,
+                species_id: data.species_id ?? animal.species_id,
+                birthdate: data.birthdate ? new Date(data.birthdate) : animal.birthdate,
+                sex: data.sex ?? animal.sex,
+                weight: data.weight ?? animal.weight,
+                status: data.status ?? animal.status
+            }).where(eq(animalTable.id, id));
+        } catch (error) {
+            throw new AppError('Failed to update animal data.', 500);
+        }
+    }
+
+    static async deleteAnimal(id: number): Promise<void> {
+        const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
+        if (!animal) throw new NotFoundError('Animal not found!');
+
+        try {
+            await db.delete(animalTable).where(eq(animalTable.id, id));
+        } catch (error) {
+            throw new AppError('Failed to delete animal data.', 500);
+        }
     }
 }
