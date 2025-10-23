@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { roles, users } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { UnauthorizedError } from "../../common/error";
@@ -19,7 +19,7 @@ export class AuthService {
         if (!await bcrypt.compare(password, user.password)) throw new UnauthorizedError('Email atau password tidak valid!')
         if (role && user.role.name !== role) throw new UnauthorizedError('Anda tidak memiliki akses!')
         
-        const token = this.generateToken(user);
+        const token = await this.generateToken(user as JwtPayload);
 
         return {
             user: {
@@ -44,8 +44,13 @@ export class AuthService {
         return user;
     }
 
-    private static generateToken(user: JwtPayload) {
+    private static async generateToken(user: JwtPayload) {
         const jwtSecret = process.env.JWT_SECRET as string || 'secret';
+
+        const sessionId = crypto.randomUUID();
+        await db.update(users).set({ session_id: sessionId }).where(eq(users.id, user.id));
+        user.session_id = sessionId;
+
         return jwt.sign(user, jwtSecret, { expiresIn: '7d' });
     }
 }

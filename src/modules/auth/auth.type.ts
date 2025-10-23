@@ -11,4 +11,5 @@ export interface JwtPayload {
         id: number;
         name: string;
     };
+    session_id?: string;
 }

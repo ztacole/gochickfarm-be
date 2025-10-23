@@ -17,7 +17,7 @@ const date = today.toISOString().split("T")[0];
 
 async function seed() {
   console.log("🌱 Seeding database (MariaDB)...");
-  const hashedPassword = await bcrypt.hash("password", 16);
+  const hashedPassword = await bcrypt.hash("password", 10);
 
   // --- ROLES ---
   await db.insert(roles).values([

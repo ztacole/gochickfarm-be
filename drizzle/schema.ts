@@ -32,6 +32,7 @@ export const users = mysqlTable("users", {
   role_id: int("role_id")
     .notNull()
     .references(() => roles.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  session_id: varchar("session_id", { length: 255 }),
   ...timestamps
 });
 
