@@ -11,7 +11,7 @@ import { AppError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
     static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = ''): Promise<{ data: AnimalResponse[], meta: Meta }> {
-        const animals = await db.select({
+        const animalsQuery = db.select({
             id: animalTable.id,
             tag: animalTable.tag,
             species: speciesTable.name,
@@ -20,16 +20,17 @@ export class AnimalService {
             weight: animalTable.weight
         }).from(animalTable)
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
-            .where(
-                and(
-                    like(animalTable.tag, `%${search}%`),
-                    species ? eq(speciesTable.name, species) : undefined,
-                    eq(animalTable.status, 'Hidup')
-                )
-            )
             .orderBy(asc(animalTable.birthdate), asc(animalTable.tag))
             .limit(limit)
             .offset((page - 1) * limit);
+
+        if (search) {
+            animalsQuery.where(like(animalTable.tag, `%${search}%`));
+        }
+
+        if (species) {
+            animalsQuery.where(eq(speciesTable.name, species));
+        }
 
         const [totalItemsResult] = await db.select({
             count: db.$count(animalTable)
@@ -37,8 +38,9 @@ export class AnimalService {
         const totalItems = Number(totalItemsResult.count);
         const totalPages = Math.ceil(totalItems / limit);
 
+        const animalsData = await animalsQuery.execute();
         return {
-            data: animals.map(animal => ({
+            data: animalsData.map(animal => ({
                 id: animal.id,
                 tag: animal.tag,
                 species: animal.species,

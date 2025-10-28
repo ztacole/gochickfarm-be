@@ -15,22 +15,25 @@ app.use(cors());
 app.use(express.json());
 
 /*
-|--------------------------------------------------------------------------
-| Mobile Routes
-|--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | Mobile Routes
+    |--------------------------------------------------------------------------
 */
 const mobilePrefix = '/api/v1/mobile';
 app.use(mobilePrefix + '/auth', authMobileRoute);
 app.use(mobilePrefix + '/animals', animalMobileRoute);
 
+
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | Web Routes
+    |--------------------------------------------------------------------------
 */
 const webPrefix = '/api/v1/web';
 app.use(webPrefix + '/auth', authWebRoute);
 app.use(webPrefix + '/animals', animalWebRoute);
+app.use(webPrefix + '/users', animalWebRoute);
+
 
 // Error Handler Middleware
 app.use(errorHandler)
