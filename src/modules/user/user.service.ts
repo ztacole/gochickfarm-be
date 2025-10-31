@@ -64,15 +64,16 @@ export class UserService {
 
     static async createUser(data: UserRequest) {
         const hashedPassword = await bcrypt.hash(data.password, 10);
+        const [staffRole] = await db.select().from(roles).where(eq(roles.name, 'Staff'));
         try {
             const [newUserId] = await db.insert(users).values({
                 full_name: data.full_name,
                 email: data.email,
                 password: hashedPassword,
-                role_id: data.role_id
+                role_id: staffRole.id
             }).$returningId();
 
-            return newUserId.id;
+            return Number(newUserId.id);
         } catch (error: any) {
             if (error.code === '23505') {
                 throw new AppError('Email sudah terdaftar!', 400);
@@ -88,7 +89,6 @@ export class UserService {
             await db.update(users).set({
                 full_name: data.full_name ?? user.full_name,
                 email: data.email ?? user.email,
-                role_id: data.role_id ?? user.role_id,
                 password: data.password ? await bcrypt.hash(data.password, 10) : user.password
             }).where(eq(users.id, id));
         } catch (error) {

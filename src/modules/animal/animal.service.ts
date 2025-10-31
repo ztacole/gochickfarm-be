@@ -94,7 +94,7 @@ export class AnimalService {
                 status: 'Hidup'
             }).$returningId();
             return {
-                id: Number(result)
+                id: Number(result.id)
             };
         } catch (error) {
             throw new AppError('Failed to create animal.', 500);
