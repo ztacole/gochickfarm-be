@@ -10,14 +10,14 @@ export class AuthController {
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Email dan password harus diisi!",
+                message: "Email and password must be filled!",
             })
         }
         const result = await AuthService.login(email, password, "Admin");
 
         res.status(200).json({
             success: true,
-            message: "Login berhasil!",
+            message: "Login successfully!",
             data: result
         });
     })
@@ -27,14 +27,14 @@ export class AuthController {
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Email dan password harus diisi!",
+                message: "Email and password must be filled!",
             })
         }
         const result = await AuthService.login(email, password);
 
         res.status(200).json({
             success: true,
-            message: "Login berhasil!",
+            message: "Login successfully!",
             data: result
         });
     })
@@ -44,7 +44,7 @@ export class AuthController {
         const result = await AuthService.me(user.id);
         res.status(200).json({
             success: true,
-            message: "Data user berhasil diambil!",
+            message: "User data has been retrieved successfully!",
             data: result
         });
     })

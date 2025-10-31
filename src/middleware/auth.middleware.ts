@@ -18,7 +18,7 @@ export const authToken = async (req: Request, res: Response, next: NextFunction)
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res.status(401).json({
             success: false,
-            message: "Token tidak ditemukan!",
+            message: "Token not found!",
         });
     }
 
@@ -32,7 +32,7 @@ export const authToken = async (req: Request, res: Response, next: NextFunction)
         if (!user || user.session_id !== payload.session_id) {
             return res.status(401).json({
                 success: false,
-                message: "Token tidak valid atau session telah diganti!",
+                message: "Invalid token or session has expired!",
             });
         }
 
@@ -41,7 +41,7 @@ export const authToken = async (req: Request, res: Response, next: NextFunction)
     } catch (error: any) {
         return res.status(401).json({
             success: false,
-            message: "Token tidak valid atau sudah kadaluwarsa!",
+            message: "Invalid token or session has expired!",
         });
     }
 }
@@ -50,7 +50,7 @@ export const adminMiddleware = (req: Request, res: Response, next: NextFunction)
     if (req.user?.role?.name !== "Admin") {
         return res.status(403).json({
             success: false,
-            message: "Akses ditolak! Hanya admin yang dapat mengakses resource ini.",
+            message: "Access denied! Only admin can access this resource.",
         });
     }
     next();
@@ -60,7 +60,7 @@ export const staffMiddleware = (req: Request, res: Response, next: NextFunction)
     if (req.user?.role?.name !== "Staff") {
         return res.status(403).json({
             success: false,
-            message: "Akses ditolak! Hanya staff yang dapat mengakses resource ini.",
+            message: "Access denied! Only staff can access this resource.",
         });
     }
     next();

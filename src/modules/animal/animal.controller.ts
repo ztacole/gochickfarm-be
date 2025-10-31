@@ -33,10 +33,10 @@ export class AnimalController {
     })
 
     static createAnimal = asyncHandler(async (req: Request, res: Response) => {
-        const { tag, species_id, birthdate, sex, weight, status } = req.body as AnimalRequest;
+        const { tag, species: species_id, birthdate, sex, weight, status } = req.body as AnimalRequest;
         if (!tag || !species_id || !birthdate || !sex || !weight) throw new ValidationError('Data hewan tidak valid!');
 
-        const animal = await AnimalService.createAnimal({ tag, species_id, birthdate, sex, weight, status });
+        const animal = await AnimalService.createAnimal({ tag, species: species_id, birthdate, sex, weight, status });
         res.status(200).json({
             success: true,
             message: "Data hewan berhasil ditambahkan!",
@@ -48,10 +48,10 @@ export class AnimalController {
         const id = Number(req.params.id);
         if (!id) throw new ValidationError('ID hewan tidak valid!');
 
-        const { tag, species_id, birthdate, sex, weight, status } = req.body as AnimalRequest;
+        const { tag, species: species_id, birthdate, sex, weight, status } = req.body as AnimalRequest;
         if (!tag && !species_id && !birthdate && !sex && !weight) throw new ValidationError('Data hewan tidak valid!');
 
-        await AnimalService.updateAnimal(id, { tag, species_id, birthdate, sex, weight, status });
+        await AnimalService.updateAnimal(id, { tag, species: species_id, birthdate, sex, weight, status });
         res.status(200).json({
             success: true,
             message: "Data hewan berhasil diubah!"

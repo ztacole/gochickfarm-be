@@ -4,7 +4,7 @@ import {
     species as speciesTable
 } from '../../../drizzle/schema';
 import { AnimalRequest, AnimalResponse } from './animal.type';
-import { and, asc, eq, like } from 'drizzle-orm';
+import { asc, eq, like } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAge } from '../../helper/helper';
 import { AppError, NotFoundError } from '../../common/error';
@@ -84,10 +84,12 @@ export class AnimalService {
     }
 
     static async createAnimal(data: AnimalRequest): Promise<any> {
+        const [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species));
+        if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
         try {
             const [result] = await db.insert(animalTable).values({
                 tag: data.tag,
-                species_id: data.species_id,
+                species_id: speciesExists.id,
                 birthdate: new Date(data.birthdate),
                 sex: data.sex,
                 weight: data.weight,
@@ -105,10 +107,13 @@ export class AnimalService {
         const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
         if (!animal) throw new NotFoundError('Animal not found!');
 
+        const [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species ?? ''));
+        if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
+
         try {
             await db.update(animalTable).set({
                 tag: data.tag ?? animal.tag,
-                species_id: data.species_id ?? animal.species_id,
+                species_id: speciesExists.id ?? animal.species_id,
                 birthdate: data.birthdate ? new Date(data.birthdate) : animal.birthdate,
                 sex: data.sex ?? animal.sex,
                 weight: data.weight ?? animal.weight,

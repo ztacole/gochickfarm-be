@@ -76,7 +76,7 @@ export class UserService {
             return Number(newUserId.id);
         } catch (error: any) {
             if (error.code === '23505') {
-                throw new AppError('Email sudah terdaftar!', 400);
+                throw new AppError('Email already exists.', 400);
             }
         }
     }

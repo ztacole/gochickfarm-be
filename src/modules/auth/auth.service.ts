@@ -15,9 +15,9 @@ export class AuthService {
             full_name: users.full_name,
             role: roles
         }).from(users).innerJoin(roles, eq(users.role_id, roles.id)).where(eq(users.email, email));
-        if (!user) throw new UnauthorizedError('Email atau password tidak valid!')
-        if (!await bcrypt.compare(password, user.password)) throw new UnauthorizedError('Email atau password tidak valid!')
-        if (role && user.role.name !== role) throw new UnauthorizedError('Anda tidak memiliki akses!')
+        if (!user) throw new UnauthorizedError('Invalid credentials!')
+        if (!await bcrypt.compare(password, user.password)) throw new UnauthorizedError('Invalid credentials!')
+        if (role && user.role.name !== role) throw new UnauthorizedError('You are not authorized!')
         
         const token = await this.generateToken(user as JwtPayload);
 
@@ -40,7 +40,7 @@ export class AuthService {
             full_name: users.full_name,
             role: roles
         }).from(users).innerJoin(roles, eq(users.role_id, roles.id)).where(eq(users.id, userId));
-        if (!user) throw new UnauthorizedError('User tidak ditemukan!')
+        if (!user) throw new UnauthorizedError('Invalid token!')
         return user;
     }
 

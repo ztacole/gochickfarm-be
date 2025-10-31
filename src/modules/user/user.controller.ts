@@ -12,7 +12,7 @@ export class UserController {
         const { data, meta } = await UserService.getAllUsers(page, limit, search, role);
         res.status(200).json({
             success: true,
-            message: "Data user berhasil diambil!",
+            message: "User data has been retrieved successfully!",
             data,
             meta
         });
@@ -23,28 +23,28 @@ export class UserController {
         const user = await UserService.getUserById(id);
         res.status(200).json({
             success: true,
-            message: "Data user berhasil diambil!",
+            message: "User data has been retrieved successfully!",
             data: user
         });
     });
 
     static createUser = asyncHandler(async (req: Request, res: Response) => {
-        const { full_name, email, password, role_id } = req.body as UserRequest;
-        const userId = await UserService.createUser({ full_name, email, password, role_id });
+        const { full_name, email, password } = req.body as UserRequest;
+        const userId = await UserService.createUser({ full_name, email, password });
         res.status(201).json({
             success: true,
-            message: "Data user berhasil disimpan!",
+            message: "User data has been saved successfully!",
             data: userId
         });
     });
 
     static updateUser = asyncHandler(async (req: Request, res: Response) => {
         const id = Number(req.params.id);
-        const { full_name, email, password, role_id } = req.body as UserRequest;
-        await UserService.updateUser(id, { full_name, email, password, role_id });
+        const { full_name, email, password } = req.body as UserRequest;
+        await UserService.updateUser(id, { full_name, email, password});
         res.status(200).json({
             success: true,
-            message: "Data user berhasil diubah!"
+            message: "User data has been updated successfully!"
         });
     });
 
@@ -53,7 +53,7 @@ export class UserController {
         await UserService.deleteUser(id);
         res.status(200).json({
             success: true,
-            message: "Data user berhasil dihapus!"
+            message: "User data has been deleted successfully!"
         });
     });
 }
