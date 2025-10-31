@@ -7,6 +7,8 @@ import authMobileRoute from './modules/auth/auth.route.mobile';
 import authWebRoute from './modules/auth/auth.route.web';
 import animalMobileRoute from './modules/animal/animal.route.mobile';
 import animalWebRoute from './modules/animal/animal.route.web';
+import userWebRoute from './modules/user/user.route.web';
+import dashboardWebRoute from './modules/dashboard/dashboard.route.web';
 
 dotenv.config();
 
@@ -32,7 +34,8 @@ app.use(mobilePrefix + '/animals', animalMobileRoute);
 const webPrefix = '/gochick-farm/api/v1/web';
 app.use(webPrefix + '/auth', authWebRoute);
 app.use(webPrefix + '/animals', animalWebRoute);
-app.use(webPrefix + '/users', animalWebRoute);
+app.use(webPrefix + '/users', userWebRoute);
+app.use(webPrefix + '/dashboard', dashboardWebRoute);
 
 
 // Error Handler Middleware
