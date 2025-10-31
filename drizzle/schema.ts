@@ -7,6 +7,7 @@ import {
   date,
   double,
   mysqlEnum,
+  datetime,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
@@ -84,7 +85,7 @@ export const transactions = mysqlTable("transactions", {
   description: varchar("description", { length: 255 }).notNull(),
   type: mysqlEnum("type", ["Pemasukan", "Pengeluaran"]).notNull(),
   total: int("total").notNull(),
-  date: date("date").notNull(),
+  date: datetime("date").notNull(),
   user_id: int("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
