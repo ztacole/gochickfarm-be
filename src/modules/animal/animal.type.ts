@@ -6,6 +6,7 @@ export interface AnimalResponse {
     sex: "Jantan" | "Betina";
     weight: number;
     birthdate: string;
+    status: "Hidup" | "Mati" | "Terjual";
 }
 
 export interface AnimalRequest {

@@ -17,7 +17,8 @@ export class AnimalService {
             species: speciesTable.name,
             birthdate: animalTable.birthdate,
             sex: animalTable.sex,
-            weight: animalTable.weight
+            weight: animalTable.weight,
+            status: animalTable.status
         }).from(animalTable)
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
             .orderBy(asc(animalTable.birthdate), asc(animalTable.tag))
@@ -47,7 +48,8 @@ export class AnimalService {
                 age: calculateAge(animal.birthdate),
                 sex: animal.sex,
                 weight: animal.weight,
-                birthdate: animal.birthdate.toISOString().split('T')[0]
+                birthdate: animal.birthdate.toISOString().split('T')[0],
+                status: animal.status
             })),
             meta: {
                 current_page: page,
@@ -65,7 +67,8 @@ export class AnimalService {
             species: speciesTable.name,
             birthdate: animalTable.birthdate,
             sex: animalTable.sex,
-            weight: animalTable.weight
+            weight: animalTable.weight,
+            status: animalTable.status
         }).from(animalTable)
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
             .where(eq(animalTable.id, id));
@@ -79,7 +82,8 @@ export class AnimalService {
             age: calculateAge(animal.birthdate),
             sex: animal.sex,
             weight: animal.weight,
-            birthdate: animal.birthdate.toISOString().split('T')[0]
+            birthdate: animal.birthdate.toISOString().split('T')[0],
+            status: animal.status
         };
     }
 

@@ -1,23 +1,36 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { animals, species, transaction_details, transactions as transactionTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { DashboardGraphResponse, DashboardTransactionResponse, WebDashboardResponse } from "./dashboard.type";
 import { calculateAge } from "../../helper/helper";
+import { stat } from "fs";
 
 
 export class DashboardService {
     static async getWebDashboardData(): Promise<WebDashboardResponse> {
-        const [chickenCount] = await db.select({
+        const [chickenCount = { count: 0 }] = await db.select({
             count: db.$count(animals)
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
-        .where(eq(species.name, 'Ayam'));
+        .where(and(eq(species.name, 'Ayam'), eq(animals.status, 'Hidup')));
 
-        const [goatCount] = await db.select({
+        const [soldChickenCount = { count: 0 }] = await db.select({
             count: db.$count(animals)
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
-        .where(eq(species.name, 'Kambing'));
+        .where(and(eq(species.name, 'Ayam'), eq(animals.status, 'Terjual')));
+
+        const [goatCount = { count: 0 }] = await db.select({
+            count: db.$count(animals)
+        }).from(animals)
+        .innerJoin(species, eq(animals.species_id, species.id))
+        .where(and(eq(species.name, 'Kambing'), eq(animals.status, 'Hidup')));
+
+        const [soldGoatCount = { count: 0 }] = await db.select({
+            count: db.$count(animals)
+        }).from(animals)
+        .innerJoin(species, eq(animals.species_id, species.id))
+        .where(and(eq(species.name, 'Kambing'), eq(animals.status, 'Terjual')));
 
         const recentAnimals = await db.select({
             id: animals.id,
@@ -25,7 +38,8 @@ export class DashboardService {
             species: species.name,
             birthdate: animals.birthdate,
             sex: animals.sex,
-            weight: animals.weight
+            weight: animals.weight,
+            status: animals.status
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
         .orderBy(desc(animals.created_at))
@@ -33,15 +47,18 @@ export class DashboardService {
 
         return {
             chicken_count: Number(chickenCount.count),
+            sold_chicken_count: Number(soldChickenCount.count),
             goat_count: Number(goatCount.count),
+            sold_goat_count: Number(soldGoatCount.count),
             recent_animals: recentAnimals.map(animal => ({
                 id: animal.id,
                 tag: animal.tag,
                 species: animal.species,
                 age: calculateAge(animal.birthdate),
-                birthdate: animal.birthdate.toISOString().split('T')[0],
                 sex: animal.sex,
-                weight: animal.weight
+                weight: animal.weight,
+                birthdate: animal.birthdate.toISOString().split('T')[0],
+                status: animal.status
             }))
         };
     }
@@ -50,7 +67,7 @@ export class DashboardService {
         const transactions = await db.select()
         .from(transactionTable)
         .orderBy(desc(transactionTable.date))
-        .limit(5);
+        .limit(6);
 
         return transactions.map(transaction => ({
             id: transaction.id,
