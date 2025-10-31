@@ -13,7 +13,7 @@ import {
 import bcrypt from "bcryptjs";
 
 const today = new Date();
-const date = today.toISOString().split("T")[0];
+const date = today.toISOString();
 
 async function seed() {
   console.log("🌱 Seeding database (MariaDB)...");
@@ -118,7 +118,7 @@ async function seed() {
   // --- TRANSACTIONS ---
   await db.insert(transactions).values([
     {
-      description: "Penjualan Sapi 1 ekor",
+      description: "Penjualan Ayam 1 ekor",
       type: "Pemasukan",
       total: 10000000,
       date: new Date(date),
@@ -145,7 +145,7 @@ async function seed() {
   await db.insert(transaction_details).values([
     {
       header_id: trx1.id,
-      animal_id: animal1.id,
+      animal_id: animal3.id,
     },
     {
       header_id: trx3.id,
@@ -153,7 +153,7 @@ async function seed() {
     },
     {
       header_id: trx3.id,
-      animal_id: animal3.id,
+      animal_id: animal1.id,
     },
   ]);
 
