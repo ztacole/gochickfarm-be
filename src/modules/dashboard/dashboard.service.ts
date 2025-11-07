@@ -1,9 +1,10 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { animals, species, transaction_details, transactions as transactionTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
-import { DashboardGraphResponse, DashboardTransactionResponse, WebDashboardResponse } from "./dashboard.type";
-import { calculateAge } from "../../helper/helper";
+import { DashboardGraphResponse, WebDashboardResponse } from "./dashboard.type";
+import { calculateAgeFormatted } from "../../helper/helper";
 import { stat } from "fs";
+import { WebTransactionResponse } from "../transaction/transaction.type";
 
 
 export class DashboardService {
@@ -54,7 +55,7 @@ export class DashboardService {
                 id: animal.id,
                 tag: animal.tag,
                 species: animal.species,
-                age: calculateAge(animal.birthdate),
+                age: calculateAgeFormatted(animal.birthdate),
                 sex: animal.sex,
                 weight: animal.weight,
                 birthdate: animal.birthdate.toISOString().split('T')[0],
@@ -63,7 +64,7 @@ export class DashboardService {
         };
     }
 
-    static async getTransactionDashboardData(): Promise<DashboardTransactionResponse[]> {
+    static async getTransactionDashboardData(): Promise<WebTransactionResponse[]> {
         const transactions = await db.select()
         .from(transactionTable)
         .orderBy(desc(transactionTable.date))

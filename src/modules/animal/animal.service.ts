@@ -6,7 +6,7 @@ import {
 import { AnimalRequest, AnimalResponse } from './animal.type';
 import { asc, desc, eq, like } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
-import { calculateAge } from '../../helper/helper';
+import { calculateAgeFormatted } from '../../helper/helper';
 import { AppError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
@@ -45,7 +45,7 @@ export class AnimalService {
                 id: animal.id,
                 tag: animal.tag,
                 species: animal.species,
-                age: calculateAge(animal.birthdate),
+                age: calculateAgeFormatted(animal.birthdate),
                 sex: animal.sex,
                 weight: animal.weight,
                 birthdate: animal.birthdate.toISOString().split('T')[0],
@@ -79,7 +79,7 @@ export class AnimalService {
             id: animal.id,
             tag: animal.tag,
             species: animal.species,
-            age: calculateAge(animal.birthdate),
+            age: calculateAgeFormatted(animal.birthdate),
             sex: animal.sex,
             weight: animal.weight,
             birthdate: animal.birthdate.toISOString().split('T')[0],

@@ -8,14 +8,6 @@ export interface WebDashboardResponse {
     recent_animals: AnimalResponse[];
 }
 
-export interface DashboardTransactionResponse {
-    id: number;
-    description: string;
-    type: "Pemasukan" | "Pengeluaran";
-    total: number;
-    date: string;
-}
-
 export interface DashboardGraphResponse {
     species: string;
     detail: {
