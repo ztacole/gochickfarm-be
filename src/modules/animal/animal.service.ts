@@ -134,7 +134,6 @@ export class AnimalService {
                 birthdate: data.birthdate ? new Date(data.birthdate) : animal.birthdate,
                 sex: data.sex ?? animal.sex,
                 weight: data.weight ?? animal.weight,
-                status: data.status ?? animal.status
             }).where(eq(animalTable.id, id));
         } catch (error: any) {
             throw new AppError('Failed to update animal data: ' + error.message, 500);

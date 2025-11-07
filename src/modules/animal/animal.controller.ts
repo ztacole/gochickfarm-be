@@ -32,10 +32,10 @@ export class AnimalController {
     })
 
     static createAnimal = asyncHandler(async (req: Request, res: Response) => {
-        const { species, birthdate, sex, weight, status } = req.body as AnimalRequest;
+        const { species, birthdate, sex, weight } = req.body as AnimalRequest;
         if (!species || !birthdate || !sex || !weight) throw new ValidationError('Invalid animal data!');
 
-        const animal = await AnimalService.createAnimal({ species, birthdate, sex, weight, status });
+        const animal = await AnimalService.createAnimal({ species, birthdate, sex, weight });
         res.status(200).json({
             success: true,
             message: "Animal data has been created successfully!",
@@ -46,10 +46,10 @@ export class AnimalController {
     static updateAnimal = asyncHandler(async (req: Request, res: Response) => {
         const id = Number(req.params.id);
 
-        const { species, birthdate, sex, weight, status } = req.body as AnimalRequest;
+        const { species, birthdate, sex, weight } = req.body as AnimalRequest;
         if (!species && !birthdate && !sex && !weight) throw new ValidationError('Invalid animal data!');
 
-        await AnimalService.updateAnimal(id, { species, birthdate, sex, weight, status });
+        await AnimalService.updateAnimal(id, { species, birthdate, sex, weight });
         res.status(200).json({
             success: true,
             message: "Animal data has been updated successfully!"
