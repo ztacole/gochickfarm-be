@@ -61,7 +61,7 @@ async function seed() {
   // --- ANIMALS ---
   await db.insert(animals).values([
     {
-      tag: "KMB001",
+      tag: "K-001",
       species_id: Number(species1.id),
       birthdate: new Date(date),
       sex: "Jantan",
@@ -69,7 +69,7 @@ async function seed() {
       status: "Hidup",
     },
     {
-      tag: "KMB002",
+      tag: "K-002",
       species_id: Number(species1.id),
       birthdate: new Date(date),
       sex: "Betina",
@@ -77,7 +77,7 @@ async function seed() {
       status: "Hidup",
     },
     {
-      tag: "AYM001",
+      tag: "A-001",
       species_id: Number(species2.id),
       birthdate: new Date(date),
       sex: "Betina",

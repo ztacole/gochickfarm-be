@@ -10,7 +10,6 @@ export interface AnimalResponse {
 }
 
 export interface AnimalRequest {
-    tag: string;
     species: string;
     birthdate: string;
     sex: "Jantan" | "Betina";

@@ -58,7 +58,7 @@ export class UserService {
         }).from(users)
             .innerJoin(roles, eq(users.role_id, roles.id))
             .where(eq(users.id, id));
-        if (!user) throw new NotFoundError('User not found!');
+        if (!user) throw new NotFoundError('User');
         return user;
     }
 
@@ -77,13 +77,15 @@ export class UserService {
         } catch (error: any) {
             if (error.code === '23505') {
                 throw new AppError('Email already exists.', 400);
+            } else {
+                throw new AppError('Failed to create user data: ' + error.message, 500);
             }
         }
     }
 
     static async updateUser(id: number, data: Partial<UserRequest>): Promise<void> {
         const [user] = await db.select().from(users).where(eq(users.id, id));
-        if (!user) throw new NotFoundError('User not found!');
+        if (!user) throw new NotFoundError('User');
 
         try {
             await db.update(users).set({
@@ -91,8 +93,12 @@ export class UserService {
                 email: data.email ?? user.email,
                 password: data.password ? await bcrypt.hash(data.password, 10) : user.password
             }).where(eq(users.id, id));
-        } catch (error) {
-            throw new AppError('Failed to update user data.', 500);
+        } catch (error: any) {
+            if (error.code === '23505') {
+                throw new AppError('Email already exists.', 400);
+            } else {
+                throw new AppError('Failed to update user data: ' + error.message, 500);
+            }
         }
     }
 

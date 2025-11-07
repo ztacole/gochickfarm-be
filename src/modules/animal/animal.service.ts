@@ -4,7 +4,7 @@ import {
     species as speciesTable
 } from '../../../drizzle/schema';
 import { AnimalRequest, AnimalResponse } from './animal.type';
-import { asc, eq, like } from 'drizzle-orm';
+import { asc, desc, eq, like } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAge } from '../../helper/helper';
 import { AppError, NotFoundError } from '../../common/error';
@@ -73,7 +73,7 @@ export class AnimalService {
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
             .where(eq(animalTable.id, id));
 
-        if (!animal) throw new NotFoundError('Animal not found!');
+        if (!animal) throw new NotFoundError('Animal');
 
         return {
             id: animal.id,
@@ -90,9 +90,23 @@ export class AnimalService {
     static async createAnimal(data: AnimalRequest): Promise<any> {
         const [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species));
         if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
+
+        const [lastSpeciesTag] = await db.select({
+            tag: animalTable.tag
+        }).from(animalTable)
+        .where(eq(animalTable.species_id, speciesExists.id))
+        .orderBy(desc(animalTable.tag));
+
+        let newTag = (data.species === 'Ayam') ? 'A' : 'K';
+
+        if (lastSpeciesTag) {
+            const lastTagNumber = Number(lastSpeciesTag.tag.slice(2));
+            newTag = `${newTag}-${(lastTagNumber + 1).toString().padStart(3, '0')}`;
+        } else newTag = `${newTag}-001`;
+
         try {
             const [result] = await db.insert(animalTable).values({
-                tag: data.tag,
+                tag: newTag,
                 species_id: speciesExists.id,
                 birthdate: new Date(data.birthdate),
                 sex: data.sex,
@@ -102,35 +116,34 @@ export class AnimalService {
             return {
                 id: Number(result.id)
             };
-        } catch (error) {
-            throw new AppError('Failed to create animal.', 500);
+        } catch (error: any) {
+            throw new AppError(`Failed to create animal data: ${error.message}`, 500);
         }
     }
 
     static async updateAnimal(id: number, data: Partial<AnimalRequest>): Promise<void> {
         const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
-        if (!animal) throw new NotFoundError('Animal not found!');
+        if (!animal) throw new NotFoundError('Animal');
 
         const [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species ?? ''));
         if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
 
         try {
             await db.update(animalTable).set({
-                tag: data.tag ?? animal.tag,
                 species_id: speciesExists.id ?? animal.species_id,
                 birthdate: data.birthdate ? new Date(data.birthdate) : animal.birthdate,
                 sex: data.sex ?? animal.sex,
                 weight: data.weight ?? animal.weight,
                 status: data.status ?? animal.status
             }).where(eq(animalTable.id, id));
-        } catch (error) {
-            throw new AppError('Failed to update animal data.', 500);
+        } catch (error: any) {
+            throw new AppError('Failed to update animal data: ' + error.message, 500);
         }
     }
 
     static async deleteAnimal(id: number): Promise<void> {
         const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
-        if (!animal) throw new NotFoundError('Animal not found!');
+        if (!animal) throw new NotFoundError('Animal');
 
         try {
             await db.delete(animalTable).where(eq(animalTable.id, id));
