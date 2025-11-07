@@ -21,6 +21,7 @@ import animalWebRoute from './modules/animal/animal.route.web';
 import userWebRoute from './modules/user/user.route.web';
 import dashboardWebRoute from './modules/dashboard/dashboard.route.web';
 import feedWebRoute from './modules/feed/feed.route.web';
+import reportWebRoute from './modules/report/report.route.web';
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use(webPrefix + '/animals', animalWebRoute);
 app.use(webPrefix + '/users', userWebRoute);
 app.use(webPrefix + '/dashboard', dashboardWebRoute);
 app.use(webPrefix + '/feeds', feedWebRoute);
+app.use(webPrefix + '/reports', reportWebRoute);
 
 
 // Error Handler Middleware
