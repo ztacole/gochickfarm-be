@@ -3,12 +3,24 @@ import { errorHandler } from './middleware/error.middleware';
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+/*
+    |--------------------------------------------------------------------------
+    | Import Mobile Routes
+    |--------------------------------------------------------------------------
+*/
 import authMobileRoute from './modules/auth/auth.route.mobile';
-import authWebRoute from './modules/auth/auth.route.web';
 import animalMobileRoute from './modules/animal/animal.route.mobile';
+
+/*
+    |--------------------------------------------------------------------------
+    | Import Web Routes
+    |--------------------------------------------------------------------------
+*/
+import authWebRoute from './modules/auth/auth.route.web';
 import animalWebRoute from './modules/animal/animal.route.web';
 import userWebRoute from './modules/user/user.route.web';
 import dashboardWebRoute from './modules/dashboard/dashboard.route.web';
+import feedWebRoute from './modules/feed/feed.route.web';
 
 dotenv.config();
 
@@ -36,6 +48,7 @@ app.use(webPrefix + '/auth', authWebRoute);
 app.use(webPrefix + '/animals', animalWebRoute);
 app.use(webPrefix + '/users', userWebRoute);
 app.use(webPrefix + '/dashboard', dashboardWebRoute);
+app.use(webPrefix + '/feeds', feedWebRoute);
 
 
 // Error Handler Middleware
