@@ -94,7 +94,7 @@ async function seed() {
       feed_id: feed1.id,
       quantity: 5.5,
       new_weight: 360,
-      health_notes: "Sehat, nafsu makan baik",
+      health_notes: '-',
       user_id: user2.id,
     },
     {
@@ -102,7 +102,7 @@ async function seed() {
       feed_id: feed3.id,
       quantity: 2.5,
       new_weight: 52,
-      health_notes: "Aktif dan sehat",
+      health_notes: "-",
       user_id: user2.id,
     },
     {
@@ -110,7 +110,7 @@ async function seed() {
       feed_id: feed2.id,
       quantity: 0.5,
       new_weight: 3.6,
-      health_notes: "Lincah",
+      health_notes: "-",
       user_id: user2.id,
     },
   ]);
