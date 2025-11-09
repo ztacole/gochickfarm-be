@@ -1,16 +1,29 @@
 import { db } from '../../config/db';
 import {
     animals as animalTable,
+    feeding_logs as feedingLogsTable,
     species as speciesTable
 } from '../../../drizzle/schema';
 import { AnimalRequest, AnimalResponse } from './animal.type';
-import { asc, count, desc, eq, like } from 'drizzle-orm';
+import { and, asc, between, count, desc, eq, like, sql } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAgeFormatted } from '../../helper/helper';
 import { AppError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
     static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = '', status: 'Hidup' | 'Mati' | 'Terjual' = 'Hidup'): Promise<{ data: AnimalResponse[], meta: Meta }> {
+        const conditions = [
+            eq(animalTable.status, status)
+        ];
+
+        if (search) {
+            conditions.push(like(animalTable.tag, `%${search}%`));
+        }
+
+        if (species) {
+            conditions.push(eq(speciesTable.name, species));
+        }
+
         const animalsQuery = db.select({
             id: animalTable.id,
             tag: animalTable.tag,
@@ -18,19 +31,24 @@ export class AnimalService {
             birthdate: animalTable.birthdate,
             sex: animalTable.sex,
             weight: animalTable.weight,
-            status: animalTable.status
-        }).from(animalTable).innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id));
-
-        if (search) {
-            animalsQuery.where(like(animalTable.tag, `%${search}%`));
-        }
-
-        if (species) {
-            animalsQuery.where(eq(speciesTable.name, species));
-        }
-
-        animalsQuery.where(eq(animalTable.status, status))
-            .orderBy(asc(animalTable.birthdate), asc(animalTable.tag))
+            status: animalTable.status,
+            feed_count: count(feedingLogsTable.id).as('feed_count')
+        }).from(animalTable)
+            .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
+            .leftJoin(
+                feedingLogsTable,
+                and(
+                    eq(feedingLogsTable.animal_id, animalTable.id),
+                    sql`DATE(${feedingLogsTable.created_at}) = CURDATE()`
+                )
+            )
+            .where(and(...conditions))
+            .groupBy(animalTable.id, speciesTable.name)
+            .orderBy(
+                asc(sql`feed_count`),
+                asc(animalTable.birthdate),
+                asc(animalTable.tag)
+            )
             .limit(limit)
             .offset((page - 1) * limit);
 
@@ -95,8 +113,8 @@ export class AnimalService {
         const [lastSpeciesTag] = await db.select({
             tag: animalTable.tag
         }).from(animalTable)
-        .where(eq(animalTable.species_id, speciesExists.id))
-        .orderBy(desc(animalTable.tag));
+            .where(eq(animalTable.species_id, speciesExists.id))
+            .orderBy(desc(animalTable.tag));
 
         let newTag = (data.species === 'Ayam') ? 'A' : 'K';
 

@@ -10,7 +10,7 @@ export class AnimalController {
         const limit = Math.min(100, Number(req.query.limit) || 10);
         const search = String(req.query.search || '');
         const species = String(req.query.species || '');
-        const status = String(req.query.status || '') as 'Hidup' | 'Mati' | 'Terjual';
+        const status = String(req.query.status || '') as 'Hidup' | 'Mati' | 'Terjual' || 'Hidup';
         if (status.toLowerCase() !== 'hidup' && status.toLowerCase() !== 'mati' && status.toLowerCase() !== 'terjual') throw new ValidationError("Invalid status! Only 'Hidup', 'Mati', or 'Terjual' are allowed.");
 
         const { data, meta } = await AnimalService.getAllAnimals(page, limit, search, species, status);

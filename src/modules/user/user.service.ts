@@ -1,13 +1,23 @@
 import { db } from "../../config/db";
 import { users, roles } from "../../../drizzle/schema";
 import { UserRequest, UserResponse } from "./user.type";
-import { count, eq, like } from "drizzle-orm";
+import { and, count, eq, like } from "drizzle-orm";
 import { AppError, NotFoundError } from "../../common/error";
 import bcrypt from "bcryptjs";
 import { Meta } from "../../common/meta.type";
 
 export class UserService {
     static async getAllUsers(page: number = 1, limit: number = 10, search: string = '', role: string = ''): Promise<{ data: UserResponse[], meta: Meta }> {
+        const conditions = [];
+
+        if (search) {
+            conditions.push(like(users.full_name, `%${search}%`));
+        }
+
+        if (role) {
+            conditions.push(eq(roles.name, role));
+        }
+
         const usersQuery = db.select({
             id: users.id,
             full_name: users.full_name,
@@ -15,16 +25,10 @@ export class UserService {
             role: roles
         }).from(users)
             .innerJoin(roles, eq(users.role_id, roles.id))
+            .where(and(...conditions))
             .limit(limit)
             .offset((page - 1) * limit);
 
-        if (search) {
-            usersQuery.where(like(users.full_name, `%${search}%`));
-        }
-
-        if (role) {
-            usersQuery.where(eq(roles.name, role));
-        }
 
         const [totalItemsResult] = await db.select({
             count: count(users.id)

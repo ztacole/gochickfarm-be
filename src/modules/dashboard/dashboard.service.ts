@@ -142,14 +142,10 @@ export class DashboardService {
         .innerJoin(species, eq(animals.species_id, species.id))
         .where(and(eq(species.name, 'Kambing'), eq(transactionTable.type, 'Pemasukan')));
 
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        const endOfToday = new Date();
-        endOfToday.setHours(23, 59, 59, 999);
         const [totalIncome] = await db.select({
             total: sql<number>`SUM(${transactionTable.total})`
         }).from(transactionTable)
-        .where(and(eq(transactionTable.type, 'Pemasukan'), between(transactionTable.date, startOfToday, endOfToday)));
+        .where(and(eq(transactionTable.type, 'Pemasukan'), sql`DATE(${transactionTable.date}) = CURDATE()`));
 
         return {
             chicken_count: Number(chickenCount.count),

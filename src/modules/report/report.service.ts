@@ -7,13 +7,16 @@ import { calculateAgeFormatted, calculateAgeInMonths } from "../../helper/helper
 
 export class ReportService {
     static async getReportTransaction(type?: "Pemasukan" | "Pengeluaran"): Promise<WebTransactionResponse[]> {
-        const transactionsQuery = db.select()
-            .from(transactionTable)
-            .orderBy(desc(transactionTable.date));
+        const conditions = [];
 
         if (type) {
-            transactionsQuery.where(eq(transactionTable.type, type));
+            conditions.push(eq(transactionTable.type, type));
         }
+
+        const transactionsQuery = db.select()
+            .from(transactionTable)
+            .where(and(...conditions))
+            .orderBy(desc(transactionTable.date));
 
         const transactions = await transactionsQuery.execute();
         return transactions.map(transaction => ({
@@ -26,6 +29,12 @@ export class ReportService {
     }
 
     static async getAnimalHarvestReport(search?: string): Promise<AnimalHarvestReportResponse[]> {
+        const conditions = [];
+
+        if (search) {
+            conditions.push(like(animalTable.tag, `%${search}%`))
+        }
+
         const animalHarvestQuery = db.select({
             id: animalTable.id,
             tag: animalTable.tag,
@@ -34,12 +43,9 @@ export class ReportService {
             sex: animalTable.sex,
             weight: animalTable.weight
         }).from(animalTable)
-            .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
-            .orderBy(asc(animalTable.birthdate), asc(animalTable.tag));
-
-        if (search) {
-            animalHarvestQuery.where(like(animalTable.tag, `%${search}%`))
-        }
+        .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
+        .where(and(...conditions))
+        .orderBy(asc(animalTable.birthdate), asc(animalTable.tag));
 
         const rawAnimalHarvest = await animalHarvestQuery.execute();
         const animalHarvest = rawAnimalHarvest.map(animal => {
@@ -63,6 +69,14 @@ export class ReportService {
     }
 
     static async getAnimalSickReport(search?: string): Promise<AnimalSickReportResponse[]> {
+        const conditions = [
+            or(eq(animalTable.status, 'Hidup'), eq(animalTable.status, 'Mati'))
+        ];
+
+        if (search) {
+            conditions.push(like(animalTable.tag, `%${search}%`))
+        }
+
         const animalSickQuery = db.select({
             id: animalTable.id,
             tag: animalTable.tag,
@@ -73,16 +87,8 @@ export class ReportService {
             status: animalTable.status
         }).from(animalTable)
             .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
-            .orderBy(asc(animalTable.birthdate), asc(animalTable.tag))
-
-        if (search) {
-            animalSickQuery.where(
-                and(
-                    or(eq(animalTable.status, 'Hidup'), eq(animalTable.status, 'Mati')),
-                    like(animalTable.tag, `%${search}%`)
-                )
-            )
-        } else animalSickQuery.where(or(eq(animalTable.status, 'Hidup'), eq(animalTable.status, 'Mati')));
+            .where(and(...conditions))
+            .orderBy(asc(animalTable.birthdate), asc(animalTable.tag));
 
         const rawAnimalSick = await animalSickQuery.execute();
         const animalSick = await Promise.all(

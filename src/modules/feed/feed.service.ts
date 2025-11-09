@@ -1,4 +1,4 @@
-import { count, eq, like } from "drizzle-orm";
+import { and, count, eq, like } from "drizzle-orm";
 import { Meta } from "../../common/meta.type";
 import { FeedRequest, FeedResponse } from "./feed.type";
 import { feeds } from "../../../drizzle/schema";
@@ -7,18 +7,21 @@ import { AppError, NotFoundError } from "../../common/error";
 
 export class FeedService {
     static async getAllFeeds(page: number = 1, limit: number = 10, search: string = ''): Promise<{ data: FeedResponse[], meta: Meta }> {
+        const conditions = [];
+
+        if (search) {
+            conditions.push(like(feeds.name, `%${search}%`));
+        }
+
         const feedsQuery = db.select({
             id: feeds.id,
             name: feeds.name,
             quantity: feeds.quantity,
             price_per_unit: feeds.price_per_unit
         }).from(feeds)
+        .where(and(...conditions))
         .limit(limit)
         .offset((page - 1) * limit);
-
-        if (search) {
-            feedsQuery.where(like(feeds.name, `%${search}%`));
-        }
 
         const [totalItemsResult] = await db.select({ count: count(feeds.id) }).from(feeds);
         const totalItems = Number(totalItemsResult.count);
