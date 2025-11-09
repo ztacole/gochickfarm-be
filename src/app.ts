@@ -11,6 +11,7 @@ const dotenv = require('dotenv');
 import authMobileRoute from './modules/auth/auth.route.mobile';
 import animalMobileRoute from './modules/animal/animal.route.mobile';
 import dashboardMobileRoute from './modules/dashboard/dashboard.route.mobile';
+import feedingLogMobileRoute from './modules/feeding-log/feeding-log.route.mobile';
 
 /*
     |--------------------------------------------------------------------------
@@ -33,17 +34,22 @@ app.use(express.json());
 /*
     |--------------------------------------------------------------------------
     | Mobile Routes
+    | Define a prefix for all mobile routes
+    | example: {baseUrl}/gochick-farm/api/v1/mobile/
     |--------------------------------------------------------------------------
 */
 const mobilePrefix = '/gochick-farm/api/v1/mobile';
 app.use(mobilePrefix + '/auth', authMobileRoute);
 app.use(mobilePrefix + '/animals', animalMobileRoute);
 app.use(mobilePrefix + '/dashboard', dashboardMobileRoute);
+app.use(mobilePrefix + '/feeding-logs', feedingLogMobileRoute);
 
 
 /*
     |--------------------------------------------------------------------------
     | Web Routes
+    | Define a prefix for all web routes
+    | example: {baseUrl}/gochick-farm/api/v1/web/
     |--------------------------------------------------------------------------
 */
 const webPrefix = '/gochick-farm/api/v1/web';
