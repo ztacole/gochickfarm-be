@@ -12,6 +12,7 @@ import authMobileRoute from './modules/auth/auth.route.mobile';
 import animalMobileRoute from './modules/animal/animal.route.mobile';
 import dashboardMobileRoute from './modules/dashboard/dashboard.route.mobile';
 import feedingLogMobileRoute from './modules/feeding-log/feeding-log.route.mobile';
+import breedingLogMobileRoute from './modules/breeding-log/breeding-log.route.mobile';
 
 /*
     |--------------------------------------------------------------------------
@@ -43,6 +44,7 @@ app.use(mobilePrefix + '/auth', authMobileRoute);
 app.use(mobilePrefix + '/animals', animalMobileRoute);
 app.use(mobilePrefix + '/dashboard', dashboardMobileRoute);
 app.use(mobilePrefix + '/feeding-logs', feedingLogMobileRoute);
+app.use(mobilePrefix + '/breeding-logs', breedingLogMobileRoute);
 
 
 /*
