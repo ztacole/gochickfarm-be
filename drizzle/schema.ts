@@ -72,7 +72,7 @@ export const feeding_logs = mysqlTable("feeding_logs", {
     .notNull()
     .references(() => feeds.id, { onDelete: "cascade", onUpdate: "cascade" }),
   quantity: double("quantity").notNull(),
-  new_weight: int("new_weight").notNull(),
+  new_weight: double("new_weight").notNull(),
   health_notes: text("health_notes").notNull(),
   user_id: int("user_id")
     .notNull()
