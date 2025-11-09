@@ -1,9 +1,9 @@
 import { Request, NextFunction, Response } from "express";
-import { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import { db } from "../config/db";
 import { users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { JwtPayload } from "../modules/auth/auth.type";
 
 declare global {
     namespace Express {

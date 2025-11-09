@@ -77,7 +77,9 @@ export class UserService {
                 role_id: staffRole.id
             }).$returningId();
 
-            return Number(newUserId.id);
+            return {
+                id: Number(newUserId)
+            };
         } catch (error: any) {
             if (error.code === '23505') {
                 throw new AppError('Email already exists.', 400);
