@@ -1,4 +1,4 @@
-import { eq, like } from "drizzle-orm";
+import { count, eq, like } from "drizzle-orm";
 import { Meta } from "../../common/meta.type";
 import { FeedRequest, FeedResponse } from "./feed.type";
 import { feeds } from "../../../drizzle/schema";
@@ -20,7 +20,7 @@ export class FeedService {
             feedsQuery.where(like(feeds.name, `%${search}%`));
         }
 
-        const [totalItemsResult] = await db.select({ count: db.$count(feeds) }).from(feeds);
+        const [totalItemsResult] = await db.select({ count: count(feeds.id) }).from(feeds);
         const totalItems = Number(totalItemsResult.count);
         const totalPages = Math.ceil(totalItems / limit);
 

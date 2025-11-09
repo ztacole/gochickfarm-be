@@ -1,7 +1,7 @@
 import { db } from "../../config/db";
 import { users, roles } from "../../../drizzle/schema";
 import { UserRequest, UserResponse } from "./user.type";
-import { eq, like } from "drizzle-orm";
+import { count, eq, like } from "drizzle-orm";
 import { AppError, NotFoundError } from "../../common/error";
 import bcrypt from "bcryptjs";
 import { Meta } from "../../common/meta.type";
@@ -27,7 +27,7 @@ export class UserService {
         }
 
         const [totalItemsResult] = await db.select({
-            count: db.$count(users)
+            count: count(users.id)
         }).from(users);
         const totalItems = Number(totalItemsResult.count);
         const totalPages = Math.ceil(totalItems / limit);
