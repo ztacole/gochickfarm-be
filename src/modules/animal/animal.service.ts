@@ -8,7 +8,7 @@ import { AnimalRequest, AnimalResponse } from './animal.type';
 import { and, asc, between, count, desc, eq, like, sql } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAgeFormatted } from '../../helper/helper';
-import { AppError, NotFoundError } from '../../common/error';
+import { AppError, handleDbError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
     static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = '', status: 'Hidup' | 'Mati' | 'Terjual' = 'Hidup'): Promise<{ data: AnimalResponse[], meta: Meta }> {
@@ -136,7 +136,7 @@ export class AnimalService {
                 id: Number(result.id)
             };
         } catch (error: any) {
-            throw new AppError(`Failed to create animal data: ${error.message}`, 500);
+            handleDbError(error, 'create animal data');
         }
     }
 
@@ -155,7 +155,7 @@ export class AnimalService {
                 weight: data.weight ?? animal.weight,
             }).where(eq(animalTable.id, id));
         } catch (error: any) {
-            throw new AppError('Failed to update animal data: ' + error.message, 500);
+            handleDbError(error, 'update animal data');
         }
     }
 
@@ -166,7 +166,7 @@ export class AnimalService {
         try {
             await db.delete(animalTable).where(eq(animalTable.id, id));
         } catch (error) {
-            throw new AppError('Failed to delete animal data.', 500);
+            handleDbError(error, 'delete animal data');
         }
     }
 }

@@ -36,3 +36,13 @@ export class DuplicateEntryError extends AppError {
     this.name = 'DuplicateEntryError';
   }
 }
+
+export function handleDbError(error: any, context: string) {
+  const code = error.code || error.cause?.code;
+
+  if (code === 'ER_DUP_ENTRY' || code === '23505') {
+    throw new AppError('Duplicate entry. Resource already exists.', 409);
+  }
+
+  throw new AppError(`Failed to ${context}: ${error.message}`, 500);
+}

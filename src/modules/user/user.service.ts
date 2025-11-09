@@ -2,7 +2,7 @@ import { db } from "../../config/db";
 import { users, roles } from "../../../drizzle/schema";
 import { UserRequest, UserResponse } from "./user.type";
 import { and, count, eq, like } from "drizzle-orm";
-import { AppError, NotFoundError } from "../../common/error";
+import { AppError, handleDbError, NotFoundError } from "../../common/error";
 import bcrypt from "bcryptjs";
 import { Meta } from "../../common/meta.type";
 
@@ -78,14 +78,10 @@ export class UserService {
             }).$returningId();
 
             return {
-                id: Number(newUserId)
+                id: Number(newUserId.id)
             };
         } catch (error: any) {
-            if (error.code === '23505') {
-                throw new AppError('Email already exists.', 400);
-            } else {
-                throw new AppError('Failed to create user data: ' + error.message, 500);
-            }
+            handleDbError(error, 'create user data');
         }
     }
 
@@ -100,11 +96,7 @@ export class UserService {
                 password: data.password ? await bcrypt.hash(data.password, 10) : user.password
             }).where(eq(users.id, id));
         } catch (error: any) {
-            if (error.code === '23505') {
-                throw new AppError('Email already exists.', 400);
-            } else {
-                throw new AppError('Failed to update user data: ' + error.message, 500);
-            }
+            handleDbError(error, 'update user data');
         }
     }
 
@@ -114,7 +106,7 @@ export class UserService {
         try {
             await db.delete(users).where(eq(users.id, id));
         } catch (error) {
-            throw new AppError('Failed to delete user data.', 500);
+            handleDbError(error, 'delete user data');
         }
     }
 }

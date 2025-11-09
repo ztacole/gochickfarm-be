@@ -2,7 +2,7 @@ import { count, eq } from "drizzle-orm";
 import { feeding_logs as feedingLogTable, feeds as feedTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { FeedingLogByAnimalResponse, FeedingLogCreateRequest } from "./feeding-log.type";
-import { AppError, NotFoundError } from "../../common/error";
+import { AppError, handleDbError, NotFoundError } from "../../common/error";
 import { Meta } from "../../common/meta.type";
 import { JwtPayload } from "../auth/auth.type";
 
@@ -69,7 +69,7 @@ export class FeedingLogService {
                 id: Number(result.id)
             };
         } catch (error: any) {
-            throw new AppError(`Failed to create feeding log data: ${error.message}`, 500);
+            handleDbError(error, 'create feeding log data');
         }
     }
 }

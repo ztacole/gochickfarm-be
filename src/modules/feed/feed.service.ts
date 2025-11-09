@@ -3,7 +3,7 @@ import { Meta } from "../../common/meta.type";
 import { FeedRequest, FeedResponse } from "./feed.type";
 import { feeds } from "../../../drizzle/schema";
 import { db } from "../../config/db";
-import { AppError, NotFoundError } from "../../common/error";
+import { AppError, handleDbError, NotFoundError } from "../../common/error";
 
 export class FeedService {
     static async getAllFeeds(page: number = 1, limit: number = 10, search: string = ''): Promise<{ data: FeedResponse[], meta: Meta }> {
@@ -60,7 +60,7 @@ export class FeedService {
                 id: Number(result.id)
             };
         } catch (error: any) {
-            throw new AppError(`Failed to create feed data: ${error.message}`, 500);
+            handleDbError(error, 'create feed data');
         }
     }
 
@@ -71,7 +71,7 @@ export class FeedService {
         try {
             await db.update(feeds).set(data).where(eq(feeds.id, id));
         } catch (error: any) {
-            throw new AppError(`Failed to update feed data: ${error.message}`, 500);
+            handleDbError(error, 'update feed data');
         }
     }
 
@@ -82,7 +82,7 @@ export class FeedService {
         try {
             await db.delete(feeds).where(eq(feeds.id, id));
         } catch (error) {
-            throw new AppError('Failed to delete feed data.', 500);
+            handleDbError(error, 'delete feed data');
         }
     }
 }

@@ -112,7 +112,7 @@ export const breeding_logs = mysqlTable("breeding_logs", {
     .notNull()
     .references(() => animals.id, { onDelete: "cascade", onUpdate: "cascade" }),
   mating_date: date("mating_date").notNull(),
-  offspring_count: int("offspring_count").default(0),
+  offspring_count: int("offspring_count").default(0).notNull(),
   user_id: int("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
