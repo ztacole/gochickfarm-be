@@ -4,13 +4,13 @@ import {
     species as speciesTable
 } from '../../../drizzle/schema';
 import { AnimalRequest, AnimalResponse } from './animal.type';
-import { asc, desc, eq, like } from 'drizzle-orm';
+import { asc, count, desc, eq, like } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAgeFormatted } from '../../helper/helper';
 import { AppError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
-    static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = ''): Promise<{ data: AnimalResponse[], meta: Meta }> {
+    static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = '', status: 'Hidup' | 'Mati' | 'Terjual' = 'Hidup'): Promise<{ data: AnimalResponse[], meta: Meta }> {
         const animalsQuery = db.select({
             id: animalTable.id,
             tag: animalTable.tag,
@@ -19,11 +19,7 @@ export class AnimalService {
             sex: animalTable.sex,
             weight: animalTable.weight,
             status: animalTable.status
-        }).from(animalTable)
-            .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
-            .orderBy(asc(animalTable.birthdate), asc(animalTable.tag))
-            .limit(limit)
-            .offset((page - 1) * limit);
+        }).from(animalTable).innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id));
 
         if (search) {
             animalsQuery.where(like(animalTable.tag, `%${search}%`));
@@ -33,9 +29,14 @@ export class AnimalService {
             animalsQuery.where(eq(speciesTable.name, species));
         }
 
+        animalsQuery.where(eq(animalTable.status, status))
+            .orderBy(asc(animalTable.birthdate), asc(animalTable.tag))
+            .limit(limit)
+            .offset((page - 1) * limit);
+
         const [totalItemsResult] = await db.select({
-            count: db.$count(animalTable)
-        }).from(animalTable);
+            count: count(animalTable.id)
+        }).from(animalTable).where(eq(animalTable.status, status));
         const totalItems = Number(totalItemsResult.count);
         const totalPages = Math.ceil(totalItems / limit);
 
