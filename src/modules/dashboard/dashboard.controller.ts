@@ -31,4 +31,13 @@ export class DashboardController {
             data
         });
     });
+
+    static getMobileDashboardData = asyncHandler(async (req: Request, res: Response) => {
+        const data = await DashboardService.getMobileDashboardData();
+        res.status(200).json({
+            success: true,
+            message: "Mobile dashboard data has been retrieved successfully!",
+            data
+        });
+    });
 }

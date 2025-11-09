@@ -15,3 +15,11 @@ export interface DashboardGraphResponse {
         total_income: number;
     }[];
 }
+
+export interface MobileDashboardResponse {
+    chicken_count: number;
+    today_sold_chicken_count: number;
+    goat_count: number;
+    today_sold_goat_count: number;
+    today_income: number;
+}

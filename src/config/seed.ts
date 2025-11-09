@@ -11,6 +11,7 @@ import {
   breeding_logs,
 } from "../../drizzle/schema";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 
 const today = new Date();
 const date = today.toISOString();
@@ -84,8 +85,24 @@ async function seed() {
       weight: 3.4,
       status: "Hidup",
     },
+    {
+      tag: "A-002",
+      species_id: Number(species2.id),
+      birthdate: new Date(date),
+      sex: "Jantan",
+      weight: 360,
+      status: "Hidup",
+    },
+    {
+      tag: "A-003",
+      species_id: Number(species2.id),
+      birthdate: new Date(date),
+      sex: "Jantan",
+      weight: 52,
+      status: "Hidup",
+    },
   ]);
-  const [animal1, animal2, animal3] = await db.select().from(animals);
+  const [animal1, animal2, animal3, animal4, animal5] = await db.select().from(animals);
 
   // --- FEEDING LOGS ---
   await db.insert(feeding_logs).values([
@@ -110,6 +127,22 @@ async function seed() {
       feed_id: feed2.id,
       quantity: 0.5,
       new_weight: 3.6,
+      health_notes: "-",
+      user_id: user2.id,
+    },
+    {
+      animal_id: animal4.id,
+      feed_id: feed2.id,
+      quantity: 1,
+      new_weight: 360,
+      health_notes: "Infection",
+      user_id: user2.id,
+    },
+    {
+      animal_id: animal5.id,
+      feed_id: feed2.id,
+      quantity: 0.5,
+      new_weight: 52,
       health_notes: "-",
       user_id: user2.id,
     },
@@ -156,6 +189,10 @@ async function seed() {
       animal_id: animal1.id,
     },
   ]);
+
+  await db.update(animals).set({ status: "Terjual" }).where(eq(animals.id, animal1.id));
+  await db.update(animals).set({ status: "Terjual" }).where(eq(animals.id, animal2.id));
+  await db.update(animals).set({ status: "Terjual" }).where(eq(animals.id, animal3.id));
 
   // --- BREEDING LOGS ---
   await db.insert(breeding_logs).values([

@@ -1,7 +1,7 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, between, count, desc, eq, sql } from "drizzle-orm";
 import { animals, species, transaction_details, transactions as transactionTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
-import { DashboardGraphResponse, WebDashboardResponse } from "./dashboard.type";
+import { DashboardGraphResponse, MobileDashboardResponse, WebDashboardResponse } from "./dashboard.type";
 import { calculateAgeFormatted } from "../../helper/helper";
 import { stat } from "fs";
 import { WebTransactionResponse } from "../transaction/transaction.type";
@@ -10,25 +10,25 @@ import { WebTransactionResponse } from "../transaction/transaction.type";
 export class DashboardService {
     static async getWebDashboardData(): Promise<WebDashboardResponse> {
         const [chickenCount = { count: 0 }] = await db.select({
-            count: db.$count(animals)
+            count: count(animals.id)
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
         .where(and(eq(species.name, 'Ayam'), eq(animals.status, 'Hidup')));
 
         const [soldChickenCount = { count: 0 }] = await db.select({
-            count: db.$count(animals)
+            count: count(animals.id)
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
         .where(and(eq(species.name, 'Ayam'), eq(animals.status, 'Terjual')));
 
         const [goatCount = { count: 0 }] = await db.select({
-            count: db.$count(animals)
+            count: count(animals.id)
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
         .where(and(eq(species.name, 'Kambing'), eq(animals.status, 'Hidup')));
 
         const [soldGoatCount = { count: 0 }] = await db.select({
-            count: db.$count(animals)
+            count: count(animals.id)
         }).from(animals)
         .innerJoin(species, eq(animals.species_id, species.id))
         .where(and(eq(species.name, 'Kambing'), eq(animals.status, 'Terjual')));
@@ -111,5 +111,52 @@ export class DashboardService {
         }
 
         return graphData;
+    }
+
+    static async getMobileDashboardData(): Promise<MobileDashboardResponse> {
+        const [chickenCount = { count: 0 }] = await db.select({
+            count: count(animals.id)
+        }).from(animals)
+        .innerJoin(species, eq(animals.species_id, species.id))
+        .where(and(eq(species.name, 'Ayam'), eq(animals.status, 'Hidup')));
+
+        const [soldChickenCount = { count: 0 }] = await db.select({
+            count: count(transaction_details.id)
+        }).from(transaction_details)
+        .innerJoin(transactionTable, eq(transaction_details.header_id, transactionTable.id))
+        .innerJoin(animals, eq(animals.id, transaction_details.animal_id))
+        .innerJoin(species, eq(animals.species_id, species.id))
+        .where(and(eq(species.name, 'Ayam'), eq(transactionTable.type, 'Pemasukan')));
+
+        const [goatCount = { count: 0 }] = await db.select({
+            count: count(animals.id)
+        }).from(animals)
+        .innerJoin(species, eq(animals.species_id, species.id))
+        .where(and(eq(species.name, 'Kambing'), eq(animals.status, 'Hidup')));
+
+        const [soldGoatCount = { count: 0 }] = await db.select({
+            count: count(transaction_details.id)
+        }).from(transaction_details)
+        .innerJoin(transactionTable, eq(transaction_details.header_id, transactionTable.id))
+        .innerJoin(animals, eq(animals.id, transaction_details.animal_id))
+        .innerJoin(species, eq(animals.species_id, species.id))
+        .where(and(eq(species.name, 'Kambing'), eq(transactionTable.type, 'Pemasukan')));
+
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+        const [totalIncome] = await db.select({
+            total: sql<number>`SUM(${transactionTable.total})`
+        }).from(transactionTable)
+        .where(and(eq(transactionTable.type, 'Pemasukan'), between(transactionTable.date, startOfToday, endOfToday)));
+
+        return {
+            chicken_count: Number(chickenCount.count),
+            today_sold_chicken_count: Number(soldChickenCount.count),
+            goat_count: Number(goatCount.count),
+            today_sold_goat_count: Number(soldGoatCount.count),
+            today_income: Number(totalIncome.total)
+        }
     }
 }
