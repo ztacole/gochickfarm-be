@@ -126,7 +126,7 @@ export class DashboardService {
         .innerJoin(transactionTable, eq(transaction_details.header_id, transactionTable.id))
         .innerJoin(animals, eq(animals.id, transaction_details.animal_id))
         .innerJoin(species, eq(animals.species_id, species.id))
-        .where(and(eq(species.name, 'Ayam'), eq(transactionTable.type, 'Pemasukan')));
+        .where(and(eq(species.name, 'Ayam'), eq(transactionTable.type, 'Pemasukan'), sql`DATE(${transactionTable.date}) = CURDATE()`));
 
         const [goatCount = { count: 0 }] = await db.select({
             count: count(animals.id)
@@ -140,7 +140,7 @@ export class DashboardService {
         .innerJoin(transactionTable, eq(transaction_details.header_id, transactionTable.id))
         .innerJoin(animals, eq(animals.id, transaction_details.animal_id))
         .innerJoin(species, eq(animals.species_id, species.id))
-        .where(and(eq(species.name, 'Kambing'), eq(transactionTable.type, 'Pemasukan')));
+        .where(and(eq(species.name, 'Kambing'), eq(transactionTable.type, 'Pemasukan'), sql`DATE(${transactionTable.date}) = CURDATE()`));
 
         const [totalIncome] = await db.select({
             total: sql<number>`SUM(${transactionTable.total})`
