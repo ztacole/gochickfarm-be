@@ -1,12 +1,12 @@
 import { and, asc, desc, eq, like, or } from "drizzle-orm";
 import { transactions as transactionTable, animals as animalTable, species as speciesTable, feeding_logs } from "../../../drizzle/schema";
 import { db } from "../../config/db";
-import { WebTransactionResponse } from "../transaction/transaction.type";
+import { TransactionResponse } from "../transaction/transaction.type";
 import { AnimalHarvestReportResponse, AnimalSickReportResponse } from "./report.type";
 import { calculateAgeFormatted, calculateAgeInMonths } from "../../helper/helper";
 
 export class ReportService {
-    static async getReportTransaction(type?: "Pemasukan" | "Pengeluaran"): Promise<WebTransactionResponse[]> {
+    static async getReportTransaction(type?: "Pemasukan" | "Pengeluaran"): Promise<TransactionResponse[]> {
         const conditions = [];
 
         if (type) {

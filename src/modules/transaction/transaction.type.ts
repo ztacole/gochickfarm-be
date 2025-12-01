@@ -1,4 +1,4 @@
-export interface WebTransactionResponse {
+export interface TransactionResponse {
     id: number;
     description: string;
     type: "Pemasukan" | "Pengeluaran";

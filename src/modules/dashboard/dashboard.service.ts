@@ -4,7 +4,7 @@ import { db } from "../../config/db";
 import { DashboardGraphResponse, MobileDashboardResponse, WebDashboardResponse } from "./dashboard.type";
 import { calculateAgeFormatted } from "../../helper/helper";
 import { stat } from "fs";
-import { WebTransactionResponse } from "../transaction/transaction.type";
+import { TransactionResponse } from "../transaction/transaction.type";
 
 
 export class DashboardService {
@@ -64,7 +64,7 @@ export class DashboardService {
         };
     }
 
-    static async getTransactionDashboardData(): Promise<WebTransactionResponse[]> {
+    static async getTransactionDashboardData(): Promise<TransactionResponse[]> {
         const transactions = await db.select()
         .from(transactionTable)
         .orderBy(desc(transactionTable.date))
