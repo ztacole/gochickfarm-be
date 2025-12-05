@@ -5,10 +5,10 @@ import { adminMiddleware, authToken } from "../../middleware/auth.middleware";
 const router = Router();
 router.use(authToken, adminMiddleware);
 
-router.get("/", AnimalController.getAllAnimals);
-router.get("/:id", AnimalController.getAnimalById);
-router.post("/", authToken, AnimalController.createAnimal);
-router.put("/:id", authToken, AnimalController.updateAnimal);
-router.delete("/:id", authToken, AnimalController.deleteAnimal);
+router.get("/", AnimalController.getAll);
+router.get("/:id", AnimalController.getById);
+router.post("/", authToken, AnimalController.create);
+router.put("/:id", authToken, AnimalController.update);
+router.delete("/:id", authToken, AnimalController.delete);
 
 export default router;

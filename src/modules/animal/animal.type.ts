@@ -14,4 +14,5 @@ export interface AnimalRequest {
     birthdate: string;
     sex: "Jantan" | "Betina";
     weight: number;
+    status?: "Hidup" | "Mati" | "Terjual";
 }

@@ -11,7 +11,7 @@ import { calculateAgeFormatted } from '../../helper/helper';
 import { AppError, handleDbError, NotFoundError } from '../../common/error';
 
 export class AnimalService {
-    static async getAllAnimals(page: number = 1, limit: number = 10, search: string = '', species: string = '', status: 'Hidup' | 'Mati' | 'Terjual' = 'Hidup'): Promise<{ data: AnimalResponse[], meta: Meta }> {
+    static async getAll(page: number = 1, limit: number = 10, search: string = '', species: string = '', status: 'Hidup' | 'Mati' | 'Terjual' = 'Hidup'): Promise<{ data: AnimalResponse[], meta: Meta }> {
         const conditions = [
             eq(animalTable.status, status)
         ];
@@ -79,7 +79,7 @@ export class AnimalService {
         };
     }
 
-    static async getAnimalById(id: number): Promise<AnimalResponse> {
+    static async getById(id: number): Promise<AnimalResponse> {
         const [animal] = await db.select({
             id: animalTable.id,
             tag: animalTable.tag,
@@ -106,7 +106,7 @@ export class AnimalService {
         };
     }
 
-    static async createAnimal(data: AnimalRequest): Promise<any> {
+    static async create(data: AnimalRequest): Promise<any> {
         const [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species));
         if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
 
@@ -140,26 +140,30 @@ export class AnimalService {
         }
     }
 
-    static async updateAnimal(id: number, data: Partial<AnimalRequest>): Promise<void> {
+    static async update(id: number, data: Partial<AnimalRequest>): Promise<void> {
         const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
         if (!animal) throw new NotFoundError('Animal');
 
-        const [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species ?? ''));
-        if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
+        let speciesExists;
+        if (data.species) {
+            [speciesExists] = await db.select().from(speciesTable).where(eq(speciesTable.name, data.species ?? ''));
+            if (!speciesExists) throw new AppError('Specified species does not exist.', 400);
+        }
 
         try {
             await db.update(animalTable).set({
-                species_id: speciesExists.id ?? animal.species_id,
+                species_id: speciesExists?.id ?? animal.species_id,
                 birthdate: data.birthdate ? new Date(data.birthdate) : animal.birthdate,
                 sex: data.sex ?? animal.sex,
                 weight: data.weight ?? animal.weight,
+                status: data.status ?? animal.status
             }).where(eq(animalTable.id, id));
         } catch (error: any) {
             handleDbError(error, 'update animal data');
         }
     }
 
-    static async deleteAnimal(id: number): Promise<void> {
+    static async delete(id: number): Promise<void> {
         const [animal] = await db.select().from(animalTable).where(eq(animalTable.id, id));
         if (!animal) throw new NotFoundError('Animal');
 

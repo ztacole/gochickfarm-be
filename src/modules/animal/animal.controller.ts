@@ -5,7 +5,7 @@ import { AnimalRequest } from "./animal.type";
 import { ValidationError } from "../../common/error";
 
 export class AnimalController {
-    static getAllAnimals = asyncHandler(async (req: Request, res: Response) => {
+    static getAll = asyncHandler(async (req: Request, res: Response) => {
         const page = Math.max(1, Number(req.query.page) || 1);
         const limit = Math.min(100, Number(req.query.limit) || 10);
         const search = String(req.query.search || '');
@@ -13,7 +13,7 @@ export class AnimalController {
         const status = String(req.query.status || '') as 'Hidup' | 'Mati' | 'Terjual' || 'Hidup';
         if (status.toLowerCase() !== 'hidup' && status.toLowerCase() !== 'mati' && status.toLowerCase() !== 'terjual') throw new ValidationError("Invalid status! Only 'Hidup', 'Mati', or 'Terjual' are allowed.");
 
-        const { data, meta } = await AnimalService.getAllAnimals(page, limit, search, species, status);
+        const { data, meta } = await AnimalService.getAll(page, limit, search, species, status);
         res.status(200).json({
             success: true,
             message: "Animal data has been retrieved successfully!",
@@ -22,10 +22,10 @@ export class AnimalController {
         })
     })
 
-    static getAnimalById = asyncHandler(async (req: Request, res: Response) => {
+    static getById = asyncHandler(async (req: Request, res: Response) => {
         const id = Number(req.params.id);
 
-        const animal = await AnimalService.getAnimalById(id);
+        const animal = await AnimalService.getById(id);
         res.status(200).json({
             success: true,
             message: "Animal data has been retrieved successfully!",
@@ -33,11 +33,11 @@ export class AnimalController {
         });
     })
 
-    static createAnimal = asyncHandler(async (req: Request, res: Response) => {
+    static create = asyncHandler(async (req: Request, res: Response) => {
         const { species, birthdate, sex, weight } = req.body as AnimalRequest;
         if (!species || !birthdate || !sex || !weight) throw new ValidationError('Invalid animal data!');
 
-        const animal = await AnimalService.createAnimal({ species, birthdate, sex, weight });
+        const animal = await AnimalService.create({ species, birthdate, sex, weight });
         res.status(200).json({
             success: true,
             message: "Animal data has been created successfully!",
@@ -45,23 +45,22 @@ export class AnimalController {
         });
     })
 
-    static updateAnimal = asyncHandler(async (req: Request, res: Response) => {
+    static update = asyncHandler(async (req: Request, res: Response) => {
         const id = Number(req.params.id);
 
-        const { species, birthdate, sex, weight } = req.body as AnimalRequest;
-        if (!species && !birthdate && !sex && !weight) throw new ValidationError('Invalid animal data!');
+        const { species, birthdate, sex, weight, status } = req.body as AnimalRequest;
 
-        await AnimalService.updateAnimal(id, { species, birthdate, sex, weight });
+        await AnimalService.update(id, { species, birthdate, sex, weight, status });
         res.status(200).json({
             success: true,
             message: "Animal data has been updated successfully!"
         });
     })
 
-    static deleteAnimal = asyncHandler(async (req: Request, res: Response) => {
+    static delete = asyncHandler(async (req: Request, res: Response) => {
         const id = Number(req.params.id);
 
-        await AnimalService.deleteAnimal(id);
+        await AnimalService.delete(id);
         res.status(200).json({
             success: true,
             message: "Animal data has been deleted successfully!"
