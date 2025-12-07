@@ -5,10 +5,10 @@ import { adminMiddleware, authToken } from "../../middleware/auth.middleware";
 const router = Router();
 router.use(authToken, adminMiddleware);
 
-router.get("/", FeedController.getAllFeeds);
-router.get("/:id", FeedController.getFeedById);
-router.post("/", FeedController.createFeed);
-router.put("/:id", FeedController.updateFeed);
-router.delete("/:id", FeedController.deleteFeed);
+router.get("/", FeedController.getAll);
+router.get("/:id", FeedController.getById);
+router.post("/", FeedController.create);
+router.put("/:id", FeedController.update);
+router.delete("/:id", FeedController.delete);
 
 export default router;

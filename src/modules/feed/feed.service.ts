@@ -1,12 +1,12 @@
 import { and, count, eq, like } from "drizzle-orm";
 import { Meta } from "../../common/meta.type";
-import { FeedRequest, FeedResponse } from "./feed.type";
+import { FeedRequest, FeedResponse, FeedResponseWithoutPagination } from "./feed.type";
 import { feeds } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { AppError, handleDbError, NotFoundError } from "../../common/error";
 
 export class FeedService {
-    static async getAllFeeds(page: number = 1, limit: number = 10, search: string = ''): Promise<{ data: FeedResponse[], meta: Meta }> {
+    static async getAll(page: number = 1, limit: number = 10, search: string = ''): Promise<{ data: FeedResponse[], meta: Meta }> {
         const conditions = [];
 
         if (search) {
@@ -39,7 +39,7 @@ export class FeedService {
         };
     }
 
-    static async getFeedById(id: number): Promise<FeedResponse> {
+    static async getById(id: number): Promise<FeedResponse> {
         const [feed] = await db.select({
             id: feeds.id,
             name: feeds.name,
@@ -53,7 +53,7 @@ export class FeedService {
         return feed;
     }
 
-    static async createFeed(data: FeedRequest): Promise<any> {
+    static async create(data: FeedRequest): Promise<any> {
         try {
             const [result] = await db.insert(feeds).values(data).$returningId();
             return {
@@ -64,7 +64,7 @@ export class FeedService {
         }
     }
 
-    static async updateFeed(id: number, data: Partial<FeedRequest>): Promise<void> {
+    static async update(id: number, data: Partial<FeedRequest>): Promise<void> {
         const [feed] = await db.select().from(feeds).where(eq(feeds.id, id));
         if (!feed) throw new NotFoundError('Feed');
 
@@ -75,7 +75,7 @@ export class FeedService {
         }
     }
 
-    static async deleteFeed(id: number): Promise<void> {
+    static async delete(id: number): Promise<void> {
         const [feed] = await db.select().from(feeds).where(eq(feeds.id, id));
         if (!feed) throw new NotFoundError('Feed');
 
@@ -84,5 +84,15 @@ export class FeedService {
         } catch (error) {
             handleDbError(error, 'delete feed data');
         }
+    }
+
+    static async getAllWithoutPagination(): Promise<FeedResponseWithoutPagination[]> {
+        const feedsData = await db.select({
+            id: feeds.id,
+            name: feeds.name,
+            quantity: feeds.quantity,
+        }).from(feeds);
+        
+        return feedsData;
     }
 }

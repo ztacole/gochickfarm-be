@@ -66,4 +66,15 @@ export class AnimalController {
             message: "Animal data has been deleted successfully!"
         });
     })
+
+    static getAllWithoutPagination = asyncHandler(async (req: Request, res: Response) => {
+        const species = req.query.species as string | undefined;
+        const sex = req.query.sex as "Jantan" | "Betina";
+        const animals = await AnimalService.getAllWithoutPagination(species, sex);
+        res.status(200).json({
+            success: true,
+            message: "Animal data has been retrieved successfully!",
+            data: animals
+        });
+    });
 }

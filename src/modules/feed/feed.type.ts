@@ -5,6 +5,12 @@ export interface FeedResponse {
     price_per_unit: number
 }
 
+export interface FeedResponseWithoutPagination {
+    id: number;
+    name: string,
+    quantity: number,
+}
+
 export interface FeedRequest {
     name: string,
     quantity: number,

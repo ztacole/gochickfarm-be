@@ -9,6 +9,11 @@ export interface AnimalResponse {
     status: "Hidup" | "Mati" | "Terjual";
 }
 
+export interface AnimalWithoutPaginationResponse {
+    id: number;
+    tag: string;
+}
+
 export interface AnimalRequest {
     species: string;
     birthdate: string;

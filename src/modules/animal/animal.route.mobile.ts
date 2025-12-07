@@ -5,6 +5,7 @@ import { authToken } from "../../middleware/auth.middleware";
 const router = Router();
 router.use(authToken);
 
+router.get("/no-pagination", AnimalController.getAllWithoutPagination);
 router.get("/", AnimalController.getAll);
 router.get("/:id", AnimalController.getById);
 router.patch("/:id/status", AnimalController.update);

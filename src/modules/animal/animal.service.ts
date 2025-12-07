@@ -4,7 +4,7 @@ import {
     feeding_logs as feedingLogsTable,
     species as speciesTable
 } from '../../../drizzle/schema';
-import { AnimalRequest, AnimalResponse } from './animal.type';
+import { AnimalRequest, AnimalResponse, AnimalWithoutPaginationResponse } from './animal.type';
 import { and, asc, between, count, desc, eq, like, sql } from 'drizzle-orm';
 import { Meta } from '../../common/meta.type';
 import { calculateAgeFormatted } from '../../helper/helper';
@@ -172,5 +172,28 @@ export class AnimalService {
         } catch (error) {
             handleDbError(error, 'delete animal data');
         }
+    }
+
+    static async getAllWithoutPagination(species?: string, sex?: "Jantan" | "Betina"): Promise<AnimalWithoutPaginationResponse[]> {
+        const conditions = [
+            eq(animalTable.status, 'Hidup')
+        ];
+        if (species) {
+            conditions.push(eq(speciesTable.name, species));
+        }
+        if (sex) {
+            conditions.push(eq(animalTable.sex, sex));
+        }
+        const animals = await db.select({
+            id: animalTable.id,
+            tag: animalTable.tag
+        }).from(animalTable)
+        .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
+        .where(and(...conditions))
+        .orderBy(asc(animalTable.tag));
+        return animals.map(animal => ({
+            id: animal.id,
+            tag: animal.tag
+        }));
     }
 }
