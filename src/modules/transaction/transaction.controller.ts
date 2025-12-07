@@ -28,4 +28,14 @@ export class TransactionController {
             data: result
         });
     });
+
+    static getById = asyncHandler(async (req: Request, res: Response) => {
+        const id = Number(req.params.id);
+        const result = await TransactionService.getById(id);
+        res.status(200).json({
+            success: true,
+            message: "Transaction detail has been retrieved successfully!",
+            data: result
+        });
+    });
 }

@@ -1,8 +1,8 @@
 import { and, count, desc, eq } from "drizzle-orm";
-import { transaction_details as transactionDetailsTable, transactions as transactionTable } from "../../../drizzle/schema";
+import { animals as animalTable, species as speciesTable, transaction_details as transactionDetailsTable, transactions as transactionTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { Meta } from "../../common/meta.type";
-import { TransactionRequest, TransactionResponse } from "./transaction.type";
+import { TransactionDetailResponse, TransactionRequest, TransactionResponse } from "./transaction.type";
 import { JwtPayload } from "jsonwebtoken";
 
 export class TransactionService {
@@ -65,5 +65,31 @@ export class TransactionService {
                 id: newTransaction.id
             };
         });
+    }
+
+    static async getById(id: number): Promise<TransactionDetailResponse> {
+        const [transaction] = await db.select()
+            .from(transactionTable)
+            .where(eq(transactionTable.id, id));
+        if (!transaction) throw new Error('Transaction not found');
+
+        const transactionDetails = await db.select()
+            .from(transactionDetailsTable)
+            .innerJoin(animalTable, eq(transactionDetailsTable.animal_id, animalTable.id))
+            .innerJoin(speciesTable, eq(animalTable.species_id, speciesTable.id))
+            .where(eq(transactionDetailsTable.header_id, id));
+        return {
+            id: transaction.id,
+            description: transaction.description,
+            type: transaction.type,
+            total: transaction.total,
+            date: transaction.date.toISOString(),
+            animals: transactionDetails.map(detail => ({
+                id: detail.animals.id,
+                tag: detail.animals.tag,
+                species: detail.species.name,
+                status: detail.animals.status
+            }))
+        };
     }
 }
