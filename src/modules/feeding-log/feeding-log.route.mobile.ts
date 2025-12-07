@@ -5,7 +5,7 @@ import { authToken } from "../../middleware/auth.middleware";
 const router = Router();
 router.use(authToken);
 
-router.get("/animals/:id", FeedingLogController.getFeedingLogByAnimalId);
 router.post("/", FeedingLogController.createFeedingLog);
+router.get("/animals/:id", FeedingLogController.getFeedingLogByAnimalId);
 
 export default router;

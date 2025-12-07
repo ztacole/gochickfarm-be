@@ -5,6 +5,7 @@ import { authToken } from "../../middleware/auth.middleware";
 const router = Router();
 router.use(authToken);
 
-router.get("/", TransactionController.getAllTransactions);
+router.get("/", TransactionController.getAll);
+router.post("/", TransactionController.create);
 
 export default router;
