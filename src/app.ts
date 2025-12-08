@@ -43,7 +43,7 @@ app.use(cacheMiddleware);
     | example: {baseUrl}/gochick-farm/api/v1/mobile/
     |--------------------------------------------------------------------------
 */
-const mobilePrefix = '/api/v1/mobile';
+const mobilePrefix = '/gochick-farm/api/v1/mobile';
 app.use(mobilePrefix + '/auth', authMobileRoute);
 app.use(mobilePrefix + '/animals', animalMobileRoute);
 app.use(mobilePrefix + '/feeds', feedMobileRoute);
@@ -60,7 +60,7 @@ app.use(mobilePrefix + '/breeding-logs', breedingLogMobileRoute);
     | example: {baseUrl}/gochick-farm/api/v1/web/
     |--------------------------------------------------------------------------
 */
-const webPrefix = '/api/v1/web';
+const webPrefix = '/gochick-farm/api/v1/web';
 app.use(webPrefix + '/auth', authWebRoute);
 app.use(webPrefix + '/animals', animalWebRoute);
 app.use(webPrefix + '/users', userWebRoute);
