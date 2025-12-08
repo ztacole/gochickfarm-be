@@ -1,5 +1,5 @@
-import { count, eq } from "drizzle-orm";
-import { feeding_logs as feedingLogTable, feeds as feedTable } from "../../../drizzle/schema";
+import { count, desc, eq } from "drizzle-orm";
+import { animals as animalTable, feeding_logs as feedingLogTable, feeds as feedTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { FeedingLogByAnimalResponse, FeedingLogCreateRequest } from "./feeding-log.type";
 import { AppError, handleDbError, NotFoundError } from "../../common/error";
@@ -21,6 +21,7 @@ export class FeedingLogService {
         }).from(feedingLogTable)
             .innerJoin(feedTable, eq(feedingLogTable.feed_id, feedTable.id))
             .where(eq(feedingLogTable.animal_id, animalId))
+            .orderBy(desc(feedingLogTable.created_at))
             .limit(limit)
             .offset((page - 1) * limit);
 
@@ -48,26 +49,36 @@ export class FeedingLogService {
     }
 
     static async createFeedingLog(data: FeedingLogCreateRequest, user: JwtPayload): Promise<any> {
-        const [existingAnimal] = await db.select().from(feedingLogTable).where(eq(feedingLogTable.animal_id, data.animal_id));
+        const [existingAnimal] = await db.select().from(animalTable).where(eq(animalTable.id, data.animal_id));
         if (!existingAnimal) throw new NotFoundError('Animal');
 
         const [existingFeed] = await db.select().from(feedTable).where(eq(feedTable.id, data.feed_id));
         if (!existingFeed) throw new NotFoundError('Feed');
 
         try {
-            const [result] = await db.insert(feedingLogTable).values(
-                {
-                    animal_id: data.animal_id,
-                    feed_id: data.feed_id,
-                    quantity: data.quantity,
-                    new_weight: data.new_weight,
-                    health_notes: data.health_notes,
-                    user_id: user.id
+            return await db.transaction(async (tx) => {
+                const [result] = await db.insert(feedingLogTable).values(
+                    {
+                        animal_id: data.animal_id,
+                        feed_id: data.feed_id,
+                        quantity: data.quantity,
+                        new_weight: data.new_weight,
+                        health_notes: data.health_notes,
+                        user_id: user.id
+                    }
+                ).$returningId();
+
+                const updatedQuantity = existingFeed.quantity - data.quantity;
+                if (updatedQuantity < 0) {
+                    throw new AppError('Insufficient feed quantity in inventory', 400);
                 }
-            ).$returningId();
-            return {
-                id: Number(result.id)
-            };
+                await tx.update(feedTable).set({ quantity: updatedQuantity }).where(eq(feedTable.id, data.feed_id));
+                await tx.update(animalTable).set({ weight: data.new_weight }).where(eq(animalTable.id, data.animal_id));
+                
+                return {
+                    id: Number(result.id)
+                };
+            });
         } catch (error: any) {
             handleDbError(error, 'create feeding log data');
         }

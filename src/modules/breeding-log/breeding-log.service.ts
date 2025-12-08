@@ -26,6 +26,7 @@ export class BreedingLogService {
         }).from(breedingLogTable)
             .innerJoin(animalTable, eq(sexPair, animalTable.id))
             .where(eq(sexCondition, animalId))
+            .orderBy(desc(breedingLogTable.created_at))
             .limit(limit)
             .offset((page - 1) * limit);
 

@@ -1,4 +1,4 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { animals as animalTable, species as speciesTable, transaction_details as transactionDetailsTable, transactions as transactionTable } from "../../../drizzle/schema";
 import { db } from "../../config/db";
 import { Meta } from "../../common/meta.type";
@@ -59,6 +59,12 @@ export class TransactionService {
                     animal_id: animalId
                 }));
                 await tx.insert(transactionDetailsTable).values(transactionDetailsData);
+                await tx.update(animalTable)
+                    .set({ status: "Terjual" })
+                    .where(and(
+                        inArray(animalTable.id, data.animal_ids),
+                        eq(animalTable.status, "Hidup")
+                    ));
             }
 
             return {

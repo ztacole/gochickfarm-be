@@ -46,8 +46,8 @@ export class AnimalService {
             .groupBy(animalTable.id, speciesTable.name)
             .orderBy(
                 asc(sql`feed_count`),
-                asc(animalTable.birthdate),
-                asc(animalTable.tag)
+                desc(animalTable.birthdate),
+                desc(animalTable.tag),
             )
             .limit(limit)
             .offset((page - 1) * limit);
