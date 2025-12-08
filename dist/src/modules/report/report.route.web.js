@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const report_controller_1 = require("./report.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authToken, auth_middleware_1.adminMiddleware);
+router.get("/transactions", report_controller_1.ReportController.getReportTransaction);
+router.get("/animal-harvest", report_controller_1.ReportController.getAnimalHarvestReport);
+router.get("/sick-animals", report_controller_1.ReportController.getAnimalSickReport);
+exports.default = router;

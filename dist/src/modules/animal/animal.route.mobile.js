@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const animal_controller_1 = require("./animal.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authToken);
+router.get("/no-pagination", animal_controller_1.AnimalController.getAllWithoutPagination);
+router.get("/", animal_controller_1.AnimalController.getAll);
+router.get("/:id", animal_controller_1.AnimalController.getById);
+router.patch("/:id/status", animal_controller_1.AnimalController.update);
+exports.default = router;
