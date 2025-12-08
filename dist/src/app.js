@@ -43,7 +43,7 @@ app.use(cache_middleware_1.cacheMiddleware);
     | example: {baseUrl}/gochick-farm/api/v1/mobile/
     |--------------------------------------------------------------------------
 */
-const mobilePrefix = '/gochick-farm/api/v1/mobile';
+const mobilePrefix = '/api/v1/mobile';
 app.use(mobilePrefix + '/auth', auth_route_mobile_1.default);
 app.use(mobilePrefix + '/animals', animal_route_mobile_1.default);
 app.use(mobilePrefix + '/feeds', feed_route_mobile_1.default);
@@ -58,7 +58,7 @@ app.use(mobilePrefix + '/breeding-logs', breeding_log_route_mobile_1.default);
     | example: {baseUrl}/gochick-farm/api/v1/web/
     |--------------------------------------------------------------------------
 */
-const webPrefix = '/gochick-farm/api/v1/web';
+const webPrefix = '/api/v1/web';
 app.use(webPrefix + '/auth', auth_route_web_1.default);
 app.use(webPrefix + '/animals', animal_route_web_1.default);
 app.use(webPrefix + '/users', user_route_web_1.default);
